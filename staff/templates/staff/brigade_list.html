@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Brigades</title>
+</head>
+<body>
+    <h1>Brigades</h1>
+
+    <a href="{% url 'brigade_create' %}">Create Brigade</a>
+
+    {% for brigade in brigades %}
+        <div>
+            <h3>{{ brigade.name }}</h3>
+
+            <p>Foreman: {{ brigade.foreman }}</p>
+
+            <a href="{% url 'brigade_edit' brigade.pk %}">Edit</a>
+        </div>
+    {% empty %}
+        <p>No brigades found.</p>
+    {% endfor %}
+</body>
+</html>
