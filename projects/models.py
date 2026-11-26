@@ -1,6 +1,6 @@
 
-from django.db import models
 from django.conf import settings
+from django.db import models
 
 
 class HouseType(models.Model):
@@ -17,7 +17,7 @@ class HouseType(models.Model):
 
 class ConstructionProject(models.Model):
 
-    STATUS_CHOICES = [
+    STATUS_CHOICES = [  # noqa: RUF012
         ("planned", "Planned"),
         ("in_progress", "In Progress"),
         ("completed", "Completed"),
