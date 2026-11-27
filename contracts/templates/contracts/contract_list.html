@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contracts</title>
+</head>
+<body>
+    <h1>Contracts</h1>
+    <p>
+        <a href="{% url 'contracts:contract_create' %}">+ New contract</a> |
+        <a href="{% url 'contracts:client_list' %}">Clients</a> |
+        <a href="{% url 'leads:list' %}">Leads</a>
+    </p>
+
+    <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>Client</th>
+                <th>House</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contract in contracts %}
+            <tr>
+                <td>{{ contract.number }}</td>
+                <td>{{ contract.client }}</td>
+                <td>{{ contract.house }}</td>
+                <td>{{ contract.total_amount }}</td>
+                <td>{{ contract.get_status_display }}</td>
+                <td><a href="{% url 'contracts:contract_detail' contract.pk %}">Open</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No contracts yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

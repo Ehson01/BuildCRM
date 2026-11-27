@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Leads</title>
+</head>
+<body>
+    <h1>Leads</h1>
+    <p>
+        <a href="{% url 'contracts:client_list' %}">Clients</a> |
+        <a href="{% url 'contracts:contract_list' %}">Contracts</a>
+    </p>
+
+    <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>House</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lead in leads %}
+            <tr>
+                <td>{{ lead.id }}</td>
+                <td>{{ lead.name }}</td>
+                <td>{{ lead.phone }}</td>
+                <td>{{ lead.email }}</td>
+                <td>{{ lead.house }}</td>
+                <td>{{ lead.get_status_display }}</td>
+                <td>
+                    <a href="{% url 'leads:detail' lead.pk %}">Details</a> |
+                    <a href="{% url 'leads:convert' lead.pk %}">Convert</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No leads yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
