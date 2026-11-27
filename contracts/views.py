@@ -73,7 +73,7 @@ class ContractDetailView(LoginRequiredMixin, DetailView):
         context['payments'] = payments
         context['paid_amount'] = paid_amount
         context['remaining_amount'] = self.object.total_amount - paid_amount
-        context['form'] = kwargs.get('form') or PaymentForm()
+        context['form'] = kwargs.get('form') or PaymentForm('contract')
         return context
 
     def post(self, request, *args, **kwargs):
