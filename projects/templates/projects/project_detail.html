@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.title }} · BuildCRM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="{% url 'projects:project_list' %}">Projects</a>
+            <span class="sep">/</span>
+            <span>{{ project.title }}</span>
+        </nav>
+        <h2>{{ project.title }}</h2>
+        <p class="subtitle">
+            {{ project.address }}
+            &nbsp;<span class="badge status-{{ project.status }}">{{ project.get_status_display }}</span>
+        </p>
+    </div>
+
+    <div class="actions">
+        <a href="{% url 'projects:project_list' %}" class="btn btn-outline">Back</a>
+        {% if user.is_staff %}
+            <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-outline">Edit</a>
+            {% if project.status != "archived" %}
+                <form method="post"
+                      action="{% url 'projects:project_archive' project.pk %}"
+                      onsubmit="return confirm('Archive this project? It will be marked as archived.');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger-outline">Archive</button>
+                </form>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+{% if project.status == "archived" %}
+    <div class="alert alert-warning">This project is archived.</div>
+{% endif %}
+
+<div class="detail-grid">
+    <section class="card">
+        <div class="card-body">
+            <h3 class="card-title">Project information</h3>
+            <dl class="info-list">
+                <div>
+                    <dt>House type</dt>
+                    <dd><a href="{% url 'projects:house_detail' project.house_type.pk %}">{{ project.house_type.title }}</a></dd>
+                </div>
+                <div>
+                    <dt>Status</dt>
+                    <dd><span class="badge status-{{ project.status }}">{{ project.get_status_display }}</span></dd>
+                </div>
+                <div>
+                    <dt>Foreman</dt>
+                    <dd>{{ project.foreman|default:"Not assigned" }}</dd>
+                </div>
+                <div>
+                    <dt>Brigade</dt>
+                    <dd>{{ project.brigade|default:"Not assigned" }}</dd>
+                </div>
+                <div>
+                    <dt>Start date</dt>
+                    <dd>{{ project.start_date|date:"F j, Y" }}</dd>
+                </div>
+                <div>
+                    <dt>End date</dt>
+                    <dd>{{ project.end_date|date:"F j, Y" }}</dd>
+                </div>
+                <div>
+                    <dt>Contract</dt>
+                    <dd>{{ project.contract|default:"No contract linked" }}</dd>
+                </div>
+                <div>
+                    <dt>Created</dt>
+                    <dd>{{ project.created_at|date:"F j, Y" }}</dd>
+                </div>
+                <div style="grid-column:1/-1;">
+                    <dt>Address</dt>
+                    <dd>{{ project.address }}</dd>
+                </div>
+            </dl>
+        </div>
+    </section>
+
+    <aside class="card">
+        <div class="card-body">
+            <h3 class="card-title">House type</h3>
+            <dl class="meta-list">
+                <div class="meta-row"><dt>Model</dt><dd>{{ project.house_type.title }}</dd></div>
+                <div class="meta-row"><dt>Area</dt><dd>{{ project.house_type.area }} m²</dd></div>
+                <div class="meta-row"><dt>Floors</dt><dd>{{ project.house_type.floors }}</dd></div>
+                <div class="meta-row"><dt>Price</dt><dd>{{ project.house_type.price|floatformat:"2g" }}</dd></div>
+            </dl>
+        </div>
+    </aside>
+</div>
+
+{% with stages=project.stages.all %}
+<div class="section-head">
+    <h3>Construction stages <span class="badge">{{ stages|length }}</span></h3>
+    <a href="{% url 'stages:stage_create' project.pk %}" class="btn btn-primary btn-sm">+ Add stage</a>
+</div>
+
+{% if stages %}
+<div class="stage-list">
+    {% for stage in stages %}
+    <article class="card stage">
+        <div class="stage-head">
+            <div class="stage-title">
+                <span class="stage-order">{{ stage.order }}</span>
+                <div>
+                    <h4>{{ stage.title }}</h4>
+                    <span class="stage-dates">
+                        {% if stage.start_date or stage.end_date %}
+                            {% if stage.start_date %}{{ stage.start_date|date:"M j, Y" }}{% else %}?{% endif %}
+                            &ndash;
+                            {% if stage.end_date %}{{ stage.end_date|date:"M j, Y" }}{% else %}?{% endif %}
+                        {% else %}
+                            No dates set
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <div class="actions">
+                <span class="badge status-{{ stage.status }}">{{ stage.get_status_display }}</span>
+                <a href="{% url 'stages:stage_edit' stage.pk %}" class="btn btn-outline btn-sm">Edit stage</a>
+                <a href="{% url 'stages:report_create' stage.pk %}" class="btn btn-outline btn-sm">+ Add report</a>
+            </div>
+        </div>
+
+        {% if stage.description %}
+            <p class="stage-desc">{{ stage.description|linebreaksbr }}</p>
+        {% endif %}
+
+        {% with reports=stage.reports.all %}
+        <div class="reports">
+            <h5>Stage reports ({{ reports|length }})</h5>
+            {% if reports %}
+            <div class="report-grid">
+                {% for report in reports %}
+                <figure class="report" style="margin:0;">
+                    {% if report.image %}
+                    <a href="{{ report.image.url }}" target="_blank" rel="noopener">
+                        <img src="{{ report.image.url }}" alt="Report for {{ stage.title }}" loading="lazy">
+                    </a>
+                    {% endif %}
+                    <figcaption class="report-body">
+                        {% if report.description %}<div>{{ report.description|truncatechars:120 }}</div>{% endif %}
+                        <div class="report-date">{{ report.created_at|date:"M j, Y H:i" }}</div>
+                    </figcaption>
+                </figure>
+                {% endfor %}
+            </div>
+            {% else %}
+                <p class="help" style="margin:0;">No reports uploaded for this stage yet.</p>
+            {% endif %}
+        </div>
+        {% endwith %}
+    </article>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card empty">
+    <h3>No stages yet</h3>
+    <p>Break the construction down into stages to start tracking progress.</p>
+    <a href="{% url 'stages:stage_create' project.pk %}" class="btn btn-primary">+ Add first stage</a>
+</div>
+{% endif %}
+{% endwith %}
+{% endblock %}

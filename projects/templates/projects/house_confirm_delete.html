@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Delete house type · BuildCRM{% endblock %}
+
+{% block content %}
+{# HouseDeleteView exposes the instance as `object` (no context_object_name is set). #}
+{% with used_by=object.construction_projects.count %}
+<div class="card confirm-card">
+    <div class="card-body">
+        {% if used_by %}
+            <div class="confirm-icon warning" aria-hidden="true">!</div>
+            <h2>This house type can't be deleted</h2>
+            <p class="confirm-text">
+                <strong>{{ object.title }}</strong> is used by {{ used_by }} construction project{{ used_by|pluralize }}.
+                Reassign or archive {{ used_by|pluralize:"that project,those projects" }} first, then try again.
+            </p>
+
+            <div class="form-actions">
+                <a href="{% url 'projects:house_detail' object.pk %}" class="btn btn-primary">Back to house type</a>
+                <a href="{% url 'projects:house_list' %}" class="btn btn-outline">All house types</a>
+            </div>
+        {% else %}
+            <div class="confirm-icon danger" aria-hidden="true">!</div>
+            <h2>Delete this house type?</h2>
+            <p class="confirm-text">This action is permanent and cannot be undone.</p>
+
+            <dl class="meta-list">
+                <div class="meta-row"><dt>Title</dt><dd>{{ object.title }}</dd></div>
+                <div class="meta-row"><dt>Area</dt><dd>{{ object.area }} m²</dd></div>
+                <div class="meta-row"><dt>Floors</dt><dd>{{ object.floors }}</dd></div>
+                <div class="meta-row"><dt>Price</dt><dd>{{ object.price|floatformat:"2g" }}</dd></div>
+            </dl>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-danger">Yes, delete</button>
+                    <a href="{% url 'projects:house_detail' object.pk %}" class="btn btn-outline">Cancel</a>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endwith %}
+{% endblock %}

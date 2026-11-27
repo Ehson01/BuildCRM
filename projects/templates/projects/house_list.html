@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}House Types · BuildCRM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>House types</h2>
+        <p class="subtitle">Available house models &middot; {{ houses|length }} total</p>
+    </div>
+
+    <div class="actions">
+        {% if user.is_staff %}
+            <a href="{% url 'projects:house_create' %}" class="btn btn-primary">+ New house type</a>
+        {% endif %}
+    </div>
+</div>
+
+{% if houses %}
+<div class="grid">
+    {% for house in houses %}
+    <article class="card house-card">
+        <a href="{% url 'projects:house_detail' house.pk %}" aria-label="{{ house.title }}">
+            {% if house.image %}
+                <img class="thumb" src="{{ house.image.url }}" alt="{{ house.title }}" loading="lazy">
+            {% else %}
+                <div class="thumb-placeholder">No image</div>
+            {% endif %}
+        </a>
+
+        <div class="card-body">
+            <h3><a href="{% url 'projects:house_detail' house.pk %}">{{ house.title }}</a></h3>
+
+            <dl class="meta-list">
+                <div class="meta-row"><dt>Area</dt><dd>{{ house.area }} m²</dd></div>
+                <div class="meta-row"><dt>Floors</dt><dd>{{ house.floors }}</dd></div>
+                <div class="meta-row"><dt>Price</dt><dd>{{ house.price|floatformat:"2g" }}</dd></div>
+            </dl>
+
+            <div class="card-footer">
+                <a href="{% url 'projects:house_detail' house.pk %}" class="btn btn-primary btn-sm">Details</a>
+                {% if user.is_staff %}
+                    <a href="{% url 'projects:house_edit' house.pk %}" class="btn btn-outline btn-sm">Edit</a>
+                    <a href="{% url 'projects:house_delete' house.pk %}" class="btn btn-danger-outline btn-sm">Delete</a>
+                {% endif %}
+            </div>
+        </div>
+    </article>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card empty">
+    <h3>No house types yet</h3>
+    {% if user.is_staff %}
+        <p>Add the first house type so it can be used in construction projects.</p>
+        <a href="{% url 'projects:house_create' %}" class="btn btn-primary">+ New house type</a>
+    {% else %}
+        <p>No house types have been added yet.</p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
