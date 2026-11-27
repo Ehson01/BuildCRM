@@ -42,12 +42,9 @@ class Contract(models.Model):
         blank=True,
         verbose_name='Lead'
     )
-    client = models.ForeignKey(
-        Client,
-        on_delete=models.PROTECT,
-        related_name='contracts',
-        verbose_name='Client'
-    )
+
+    client = models.ForeignKey('contracts.Client', on_delete=models.PROTECT, related_name='contracts')
+
     house = models.ForeignKey(
         'projects.HouseType',
         on_delete=models.PROTECT,
