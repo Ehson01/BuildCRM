@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Material Requests</title>
+</head>
+<body>
+    <h1>Material Requests</h1>
+
+    {% for i in requests %}
+        <hr>
+
+        <h3>{{ i.material.name }}</h3>
+        <p>Project: {{ i.project.title }}</p>
+        <p>Quantity: {{ i.quantity }}</p>
+        <p>Requested by: {{ i.requested_by.username }}</p>
+        <p>Status: {{ i.get_status_display }}</p>
+
+        {% if user.role == 'manager' and i.status == 'pending' %}
+            <form method="POST" action="{% url 'request_approve' i.pk %}">
+                {% csrf_token %}
+                <button type="submit">Approve</button>
+            </form>
+
+            <form method="POST" action="{% url 'request_reject' i.pk %}">
+                {% csrf_token %}
+                <button type="submit">Reject</button>
+            </form>
+        {% endif %}
+    {% empty %}
+        <p>No requests yet.</p>
+    {% endfor %}
+</body>
+</html>
+
