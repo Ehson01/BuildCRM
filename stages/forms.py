@@ -29,3 +29,4 @@ class StageReportForm(forms.ModelForm):
             "image",
             "description",
         ]
+ 

@@ -1,99 +1,93 @@
 
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
+from django.views.generic import CreateView, UpdateView
 
 from projects.models import ConstructionProject
 
 from .forms import StageForm, StageReportForm
-from .models import Stage
+from .models import Stage, StageReport
 
 
-def check_project_access(request, project):
-    if not request.user.is_staff and project.foreman_id != request.user.id:
-        raise PermissionDenied
+class ProjectAccessMixin(LoginRequiredMixin, UserPassesTestMixin):
+
+    def test_func(self):
+        if self.request.user.is_staff:
+            return True
+
+        if "project_id" in self.kwargs:
+            project = get_object_or_404(
+                ConstructionProject,
+                pk=self.kwargs["project_id"]
+            )
+        else:
+            stage = get_object_or_404(
+                Stage,
+                pk=self.kwargs["pk"]
+            )
+            project = stage.project
+
+        return project.foreman == self.request.user
 
 
-@login_required
-def stage_create(request, project_id):
-    project = get_object_or_404(
-        ConstructionProject,
-        pk=project_id
-    )
-
-    check_project_access(request, project)
-
-    form = StageForm(request.POST or None)
-
-    if form.is_valid():
-        stage = form.save(commit=False)
-        stage.project = project
-        stage.save()
-
-        return redirect("projects:project_detail", pk=project.pk)
-
-    return render(
-        request,
-        "stages/stage_form.html",
-        {"form": form, "project": project}
-    )
 
 
-@login_required
-def stage_edit(request, pk):
-    stage = get_object_or_404(
-        Stage.objects.select_related("project"),
-        pk=pk
-    )
+class StageCreateView(ProjectAccessMixin, CreateView):
+    model = Stage
+    form_class = StageForm
+    template_name = "stages/stage_form.html"
 
-    check_project_access(request, stage.project)
-
-    form = StageForm(
-        request.POST or None,
-        instance=stage
-    )
-
-    if form.is_valid():
-        form.save()
-
-        return redirect(
-            "projects:project_detail",
-            pk=stage.project.pk
+    def form_valid(self, form):
+        project = get_object_or_404(
+            ConstructionProject,
+            pk=self.kwargs["project_id"]
         )
 
-    return render(
-        request,
-        "stages/stage_form.html",
-        {"form": form, "stage": stage}
-    )
+        form.instance.project = project
 
+        return super().form_valid(form)
 
-@login_required
-def report_create(request, pk):
-    stage = get_object_or_404(
-        Stage.objects.select_related("project"),
-        pk=pk
-    )
-
-    check_project_access(request, stage.project)
-
-    form = StageReportForm(
-        request.POST or None,
-        request.FILES or None
-    )
-
-    if form.is_valid():
-        report = form.save(commit=False)
-        report.stage = stage
-        report.save()
-
-        return redirect(
+    def get_success_url(self):
+        return reverse(
             "projects:project_detail",
-            pk=stage.project.pk
+            kwargs={"pk": self.kwargs["project_id"]}
         )
 
-    return render(
-        request,
-        "stages/report_form.html",
-        {"form": form, "stage": stage}
-    )
+
+
+
+class StageUpdateView(ProjectAccessMixin, UpdateView):
+    model = Stage
+    form_class = StageForm
+    template_name = "stages/stage_form.html"
+
+    def get_success_url(self):
+        return reverse(
+            "projects:project_detail",
+            kwargs={"pk": self.object.project.pk}
+        )
+
+
+
+
+class StageReportCreateView(ProjectAccessMixin, CreateView):
+    model = StageReport
+    form_class = StageReportForm
+    template_name = "stages/report_form.html"
+
+    def form_valid(self, form):
+        stage = get_object_or_404(
+            Stage,
+            pk=self.kwargs["pk"]
+        )
+
+        form.instance.stage = stage
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            "projects:project_detail",
+            kwargs={"pk": self.object.stage.project.pk}
+        )

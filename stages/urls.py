@@ -8,19 +8,19 @@ app_name = "stages"
 urlpatterns = [
     path(
         "project/<int:project_id>/create/",
-        views.stage_create,
+        views.StageCreateView.as_view(),
         name="stage_create"
     ),
 
     path(
         "<int:pk>/edit/",
-        views.stage_edit,
+        views.StageUpdateView.as_view(),
         name="stage_edit"
     ),
 
     path(
         "<int:pk>/reports/create/",
-        views.report_create,
+        views.StageReportCreateView.as_view(),
         name="report_create"
     ),
 ]
