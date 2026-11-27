@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ client.full_name }}</title>
+</head>
+<body>
+    <h1>{{ client.full_name }}</h1>
+    <p><a href="{% url 'contracts:client_list' %}">Back to clients</a></p>
+
+    <p><strong>Phone:</strong> {{ client.phone }}</p>
+    <p><strong>Email:</strong> {{ client.email }}</p>
+    <p><strong>Passport:</strong> {{ client.passport_data }}</p>
+    <p><strong>Address:</strong> {{ client.address }}</p>
+
+    <h2>Contracts</h2>
+    <ul>
+        {% for contract in client.contracts.all %}
+        <li>
+            <a href="{% url 'contracts:contract_detail' contract.pk %}">
+                Contract #{{ contract.number }}
+            </a>
+            — {{ contract.total_amount }} ({{ contract.get_status_display }})
+        </li>
+        {% empty %}
+        <li>No contracts for this client.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

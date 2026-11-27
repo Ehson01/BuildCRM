@@ -1,8 +1,8 @@
 from django.apps import apps
-from django.contrib.auth.mixins import LoginRequiredMixin,RedirectView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
-from django.views.generic import CreateView, DetailView, ListView
+from django.views.generic import CreateView, DetailView, ListView,RedirectView
 from contracts.models import Client
 from django.urls import reverse
 from .forms import LeadForm

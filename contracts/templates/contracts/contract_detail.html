@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contract #{{ contract.number }}</title>
+</head>
+<body>
+    <h1>Contract #{{ contract.number }}</h1>
+    <p><a href="{% url 'contracts:contract_list' %}">Back to contracts</a></p>
+
+    <p><strong>Client:</strong> <a href="{% url 'contracts:client_detail' contract.client.pk %}">{{ contract.client }}</a></p>
+    <p><strong>House:</strong> {{ contract.house }}</p>
+    <p><strong>Status:</strong> {{ contract.get_status_display }}</p>
+    <p><strong>Start Date:</strong> {{ contract.start_date }}</p>
+    <p><strong>End Date:</strong> {{ contract.end_date }}</p>
+    <p><strong>Total Amount:</strong> {{ contract.total_amount }}</p>
+    <p><strong>Paid Amount:</strong> {{ paid_amount }}</p>
+    <p><strong>Remaining Amount:</strong> {{ remaining_amount }}</p>
+
+    <h2>Payments</h2>
+    <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Comment</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in payments %}
+            <tr>
+                <td>{{ payment.payment_date }}</td>
+                <td>{{ payment.amount }}</td>
+                <td>{{ payment.get_payment_method_display }}</td>
+                <td>{{ payment.comment|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No payments yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Add Payment</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add payment</button>
+    </form>
+</body>
+</html>
