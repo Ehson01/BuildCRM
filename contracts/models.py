@@ -4,7 +4,7 @@ from django.utils import timezone
 
 class Client(models.Model):
     user = models.OneToOneField(
-        'users.User',
+        'accounts.User',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -49,7 +49,7 @@ class Contract(models.Model):
         verbose_name='Client'
     )
     house = models.ForeignKey(
-        'houses.House',
+        'projects.HouseType',
         on_delete=models.PROTECT,
         related_name='contracts',
         verbose_name='House project'
