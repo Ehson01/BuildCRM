@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Edit project{% else %}New project{% endif %} · BuildCRM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="{% url 'projects:project_list' %}">Projects</a>
+            <span class="sep">/</span>
+            {% if object %}
+                <a href="{% url 'projects:project_detail' object.pk %}">{{ object.title }}</a>
+                <span class="sep">/</span>
+                <span>Edit</span>
+            {% else %}
+                <span>New project</span>
+            {% endif %}
+        </nav>
+        <h2>{% if object %}Edit project{% else %}New project{% endif %}</h2>
+        <p class="subtitle">
+            {% if object %}Update the details of this construction project.{% else %}Fill in the details of the new construction project.{% endif %}
+        </p>
+    </div>
+</div>
+
+<div class="card form-card">
+    <div class="card-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="form-grid">
+                {% for field in form %}
+                <div class="form-field{% if field.name == 'title' or field.name == 'address' %} full{% endif %}{% if field.errors %} has-error{% endif %}">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}{% if field.field.required %}<span class="req">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}<span class="help">{{ field.help_text }}</span>{% endif %}
+                    {{ field.errors }}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">{% if object %}Save changes{% else %}Create project{% endif %}</button>
+                {% if object %}
+                    <a href="{% url 'projects:project_detail' object.pk %}" class="btn btn-outline">Cancel</a>
+                {% else %}
+                    <a href="{% url 'projects:project_list' %}" class="btn btn-outline">Cancel</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

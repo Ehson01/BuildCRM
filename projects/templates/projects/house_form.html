@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Edit house type{% else %}New house type{% endif %} · BuildCRM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="{% url 'projects:house_list' %}">House types</a>
+            <span class="sep">/</span>
+            {% if object %}
+                <a href="{% url 'projects:house_detail' object.pk %}">{{ object.title }}</a>
+                <span class="sep">/</span>
+                <span>Edit</span>
+            {% else %}
+                <span>New house type</span>
+            {% endif %}
+        </nav>
+        <h2>{% if object %}Edit house type{% else %}New house type{% endif %}</h2>
+        <p class="subtitle">
+            {% if object %}Update the specification of this house model.{% else %}Describe a new house model that can be used in projects.{% endif %}
+        </p>
+    </div>
+</div>
+
+<div class="card form-card">
+    <div class="card-body">
+        {# enctype is required: HouseTypeForm contains an ImageField #}
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="form-grid">
+                {% for field in form %}
+                <div class="form-field{% if field.name == 'title' or field.name == 'description' or field.name == 'image' %} full{% endif %}{% if field.errors %} has-error{% endif %}">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}{% if field.field.required %}<span class="req">*</span>{% endif %}
+                    </label>
+
+                    {% if field.name == "image" and object and object.image %}
+                        <img class="current-image" src="{{ object.image.url }}" alt="Current image of {{ object.title }}">
+                    {% endif %}
+
+                    {{ field }}
+                    {% if field.help_text %}<span class="help">{{ field.help_text }}</span>{% endif %}
+                    {{ field.errors }}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">{% if object %}Save changes{% else %}Create house type{% endif %}</button>
+                {% if object %}
+                    <a href="{% url 'projects:house_detail' object.pk %}" class="btn btn-outline">Cancel</a>
+                {% else %}
+                    <a href="{% url 'projects:house_list' %}" class="btn btn-outline">Cancel</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

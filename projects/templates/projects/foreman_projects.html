@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}My Projects · BuildCRM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>My projects</h2>
+        <p class="subtitle">Projects where you are the assigned foreman &middot; {{ projects|length }} total</p>
+    </div>
+
+    <div class="actions">
+        {% if user.is_staff %}
+            <a href="{% url 'projects:project_list' %}" class="btn btn-outline">All projects</a>
+        {% endif %}
+    </div>
+</div>
+
+{% if projects %}
+<div class="grid">
+    {% for project in projects %}
+    <article class="card project-card">
+        <div class="card-body">
+            <div class="card-top">
+                <h3><a href="{% url 'projects:project_detail' project.pk %}">{{ project.title }}</a></h3>
+                <span class="badge status-{{ project.status }}">{{ project.get_status_display }}</span>
+            </div>
+
+            <p class="subtitle" style="margin:0;color:var(--muted);">{{ project.address }}</p>
+
+            <dl class="meta-list">
+                <div class="meta-row">
+                    <dt>House type</dt>
+                    <dd>{{ project.house_type.title }}</dd>
+                </div>
+                <div class="meta-row">
+                    <dt>Brigade</dt>
+                    <dd>{{ project.brigade|default:"—" }}</dd>
+                </div>
+                <div class="meta-row">
+                    <dt>Start</dt>
+                    <dd>{{ project.start_date|date:"M j, Y" }}</dd>
+                </div>
+                <div class="meta-row">
+                    <dt>End</dt>
+                    <dd>{{ project.end_date|date:"M j, Y" }}</dd>
+                </div>
+                <div class="meta-row">
+                    <dt>Stages</dt>
+                    <dd>{{ project.stages.count }}</dd>
+                </div>
+            </dl>
+
+            <div class="card-footer">
+                <a href="{% url 'projects:project_detail' project.pk %}" class="btn btn-primary btn-sm">Open project</a>
+                <a href="{% url 'stages:stage_create' project.pk %}" class="btn btn-outline btn-sm">+ Add stage</a>
+            </div>
+        </div>
+    </article>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card empty">
+    <h3>No projects assigned to you</h3>
+    <p>When a manager assigns you as foreman, the project will appear here.</p>
+</div>
+{% endif %}
+{% endblock %}
