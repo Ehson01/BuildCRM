@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BuildCRM{% endblock %}</title>
+</head>
+<body>
+
+    <header>
+        <h1>BuildCRM</h1>
+
+        <nav>
+            <a href="{% url 'projects:project_list' %}">Projects</a>
+            <a href="{% url 'projects:house_list' %}">House Types</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>BuildCRM</p>
+    </footer>
+
+</body>
+</html>
