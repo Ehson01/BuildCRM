@@ -15,18 +15,22 @@ class ContractForm(forms.ModelForm):
         fields = ['client', 'house', 'number', 'total_amount', 'end_date', 'status']
         widgets = {'end_date': forms.DateInput(attrs={'type': 'date'}),}
 
+
     def clean_total_amount(self):
         amount = self.cleaned_data.get('total_amount')
         if amount is None or amount<=0:
+
             raise forms.ValidationError('Total amount must be greater than 0.')
         return amount
 
 
 class PaymentForm(forms.ModelForm):
+
     class Meta:
         model = Payment
         fields = ['amount', 'payment_method', 'payment_date', 'comment']
         widgets = {'payment_date': forms.DateInput(attrs={'type': 'date'}),}
+
 
     def __init__(self, *args, contract=None, **kwargs):
         super().__init__(*args, **kwargs)

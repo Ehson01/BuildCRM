@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Materials</title>
+</head>
+<body>
+    <h1>Materials</h1>
+
+    <a href="{% url 'material_create' %}">Add Material</a>
+
+    <form method="GET">
+        <input
+            type="text"
+            name="search"
+            placeholder="Search material..."
+            value="{{ search|default:'' }}"
+        >
+
+        <button type="submit">Search</button>
+
+        <label>
+            <input
+                type="checkbox"
+                name="low_stock"
+                value="1"
+                {% if low_stock %}checked{% endif %}
+            >
+            Low stock only
+        </label>
+
+        <button type="submit">Filter</button>
+
+        <a href="{% url 'material_list' %}">Reset</a>
+    </form>
+
+    {% for material in materials %}
+        <div>
+            <h3>{{ material.name }}</h3>
+
+            <p>{{ material.description }}</p>
+
+            <p>Quantity: {{ material.quantity }} {{ material.unit }}</p>
+
+            <p>Minimum quantity: {{ material.min_quantity }} {{ material.unit }}</p>
+
+            <p>Price: {{ material.price }}</p>
+
+            {% if material.quantity < material.min_quantity %}
+                <p>⚠️ Low stock!</p>
+            {% endif %}
+
+            <a href="{% url 'material_edit' material.pk %}">Edit</a>
+        </div>
+    {% empty %}
+        <p>No materials found.</p>
+    {% endfor %}
+</body>
+</html>

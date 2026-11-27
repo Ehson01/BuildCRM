@@ -1,11 +1,15 @@
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
+
 from django.views.generic import CreateView, DetailView, ListView,RedirectView
 from contracts.models import Client
 from django.urls import reverse
 from .forms import LeadForm
 from .models import Lead
+
 from projects.models import HouseType
+
 
 
 class LeadCreateView(CreateView):
@@ -14,6 +18,7 @@ class LeadCreateView(CreateView):
     template_name = 'leads/lead_form.html'
 
     def form_valid(self, form):
+
         form.instance.house = get_object_or_404(
         HouseType,
         pk=self.kwargs['house_id']
@@ -21,6 +26,7 @@ class LeadCreateView(CreateView):
         return super().form_valid(form)
     def get_success_url(self):
         return reverse('leads:list')
+
 
 
 class LeadListView(LoginRequiredMixin, ListView):
@@ -51,7 +57,9 @@ class LeadConvertView(LoginRequiredMixin, RedirectView):
                 defaults={'full_name': lead.name,'email': lead.email,})
             lead.client = client
 
+
         lead.status = 'contract'
+
         lead.save()
 
         return reverse('contracts:contract_create_from_lead', kwargs={'lead_id': lead.pk})

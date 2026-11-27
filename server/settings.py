@@ -37,11 +37,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'leads',
-    'contracts',
+
+
+    'accounts',
+    'staff',
+    'materials',
     'projects',
     'stages',
+    'contracts',
+    'leads',
 ]
+
+AUTH_USER_MODEL = 'accounts.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -121,17 +128,8 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
-MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
-# Email
-# https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
-
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
-
-
-AUTH_USER_MODEL = "accounts.User"
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'buildcrm@example.com'
