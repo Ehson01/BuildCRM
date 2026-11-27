@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% comment %}
+    NOTE: BuildCRM does not delete projects - ProjectArchiveView marks them
+    as "archived" instead. This page is therefore an ARCHIVE confirmation
+    and posts to projects:project_archive. It is not rendered by any view
+    at the moment (ProjectArchiveView only implements post()); project_detail.html
+    archives with an inline POST form. It expects a single project as `object`
+    (provided by any generic single-object view).
+{% endcomment %}
+
+{% block title %}Archive project · BuildCRM{% endblock %}
+
+{% block content %}
+<div class="card confirm-card">
+    <div class="card-body">
+        <div class="confirm-icon warning" aria-hidden="true">!</div>
+        <h2>Archive this project?</h2>
+        <p class="confirm-text">
+            The project will be marked as <strong>archived</strong>. Nothing is deleted &ndash;
+            its stages and reports are kept, and a manager can restore it by changing the status.
+        </p>
+
+        <dl class="meta-list">
+            <div class="meta-row"><dt>Project</dt><dd>{{ object.title }}</dd></div>
+            <div class="meta-row"><dt>Address</dt><dd>{{ object.address }}</dd></div>
+            <div class="meta-row"><dt>Status</dt><dd><span class="badge status-{{ object.status }}">{{ object.get_status_display }}</span></dd></div>
+        </dl>
+
+        {% if object.status == "archived" %}
+            <div class="alert alert-info">This project is already archived.</div>
+        {% endif %}
+
+        <form method="post" action="{% url 'projects:project_archive' object.pk %}">
+            {% csrf_token %}
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger"{% if object.status == "archived" %} disabled{% endif %}>Yes, archive project</button>
+                <a href="{% url 'projects:project_detail' object.pk %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
