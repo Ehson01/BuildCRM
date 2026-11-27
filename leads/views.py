@@ -1,9 +1,10 @@
 from django.apps import apps
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin,RedirectView
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 from django.views.generic import CreateView, DetailView, ListView
 from contracts.models import Client
+from django.urls import reverse
 from .forms import LeadForm
 from .models import Lead
 
@@ -38,20 +39,17 @@ class LeadDetailView(LoginRequiredMixin, DetailView):
         return redirect('leads:detail', pk=lead.pk)
 
 
-class LeadConvertView(LoginRequiredMixin, View):
-    def get(self, request, pk):
-        lead = get_object_or_404(Lead, pk=pk)
+class LeadConvertView(LoginRequiredMixin, RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        lead = get_object_or_404(Lead, pk=kwargs['pk'])
 
         if not lead.client:
             client, _ = Client.objects.get_or_create(
                 phone=lead.phone,
-                defaults={
-                    'full_name': lead.name,
-                    'email': lead.email,
-                }
-            )
+                defaults={'full_name': lead.name,'email': lead.email,})
             lead.client = client
 
         lead.status = 'in_progress'
         lead.save()
-        return redirect('contracts:contract_create_from_lead', lead_id=lead.pk)
+
+        return reverse('contracts:contract_create_from_lead', kwargs={'lead_id': lead.pk})
