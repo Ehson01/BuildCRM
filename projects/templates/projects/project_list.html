@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Projects · BuildCRM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Projects</h2>
+        <p class="subtitle">
+            {% if user.is_staff %}All construction projects{% else %}Projects assigned to you{% endif %}
+            &middot; {{ projects|length }} total
+        </p>
+    </div>
+
+    <div class="actions">
+        <a href="{% url 'projects:foreman_projects' %}" class="btn btn-outline">My projects</a>
+        {% if user.is_staff %}
+            <a href="{% url 'projects:project_create' %}" class="btn btn-primary">+ New project</a>
+        {% endif %}
+    </div>
+</div>
+
+{% if projects %}
+<div class="card">
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>House type</th>
+                    <th>Foreman</th>
+                    <th>Brigade</th>
+                    <th>Timeline</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for project in projects %}
+                <tr{% if project.status == "archived" %} class="is-archived"{% endif %}>
+                    <td data-label="Project">
+                        <a class="cell-title" href="{% url 'projects:project_detail' project.pk %}">{{ project.title }}</a>
+                        <span class="cell-sub">{{ project.address }}</span>
+                    </td>
+                    <td data-label="House type">
+                        <a href="{% url 'projects:house_detail' project.house_type.pk %}">{{ project.house_type.title }}</a>
+                    </td>
+                    <td data-label="Foreman">{{ project.foreman|default:"—" }}</td>
+                    <td data-label="Brigade">{{ project.brigade|default:"—" }}</td>
+                    <td data-label="Timeline">{{ project.start_date|date:"M j, Y" }} &ndash; {{ project.end_date|date:"M j, Y" }}</td>
+                    <td data-label="Status">
+                        <span class="badge status-{{ project.status }}">{{ project.get_status_display }}</span>
+                    </td>
+                    <td class="cell-actions">
+                        <a href="{% url 'projects:project_detail' project.pk %}" class="btn btn-outline btn-sm">View</a>
+                        {% if user.is_staff %}
+                            <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-outline btn-sm">Edit</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card empty">
+    <h3>No projects yet</h3>
+    {% if user.is_staff %}
+        <p>Create the first construction project to get started.</p>
+        <a href="{% url 'projects:project_create' %}" class="btn btn-primary">+ New project</a>
+    {% else %}
+        <p>No projects are assigned to you at the moment.</p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

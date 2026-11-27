@@ -17,5 +17,5 @@ urlpatterns = [
     path("my/", views.ForemanProjectListView.as_view(), name="foreman_projects"),
     path("<int:pk>/", views.ProjectDetailView.as_view(), name="project_detail"),
     path("<int:pk>/edit/", views.ProjectUpdateView.as_view(), name="project_edit"),
-    path("<int:pk>/delete/", views.ProjectDeleteView.as_view(), name="project_delete"),
+    path("<int:pk>/archive/", views.ProjectArchiveView.as_view(), name="project_archive"),
 ]

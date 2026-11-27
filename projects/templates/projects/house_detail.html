@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}{{ house.title }} · BuildCRM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="{% url 'projects:house_list' %}">House types</a>
+            <span class="sep">/</span>
+            <span>{{ house.title }}</span>
+        </nav>
+        <h2>{{ house.title }}</h2>
+    </div>
+
+    <div class="actions">
+        <a href="{% url 'projects:house_list' %}" class="btn btn-outline">Back</a>
+        {% if user.is_staff %}
+            <a href="{% url 'projects:house_edit' house.pk %}" class="btn btn-outline">Edit</a>
+            <a href="{% url 'projects:house_delete' house.pk %}" class="btn btn-danger-outline">Delete</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="detail-grid">
+    <section class="card" style="overflow:hidden;">
+        {% if house.image %}
+            <img class="detail-image" src="{{ house.image.url }}" alt="{{ house.title }}">
+        {% else %}
+            <div class="thumb-placeholder">No image</div>
+        {% endif %}
+
+        <div class="card-body">
+            <h3 class="card-title">Description</h3>
+            <p class="prose" style="margin:0;">{{ house.description|linebreaksbr }}</p>
+        </div>
+    </section>
+
+    <div class="detail-stack">
+        <aside class="card">
+            <div class="card-body">
+                <h3 class="card-title">Specifications</h3>
+                <div class="stat-row" style="margin-top:0;">
+                    <div class="stat"><div class="value">{{ house.area }}</div><div class="label">m²</div></div>
+                    <div class="stat"><div class="value">{{ house.floors }}</div><div class="label">Floors</div></div>
+                    <div class="stat"><div class="value">{{ house.price|floatformat:"0g" }}</div><div class="label">Price</div></div>
+                </div>
+                <dl class="meta-list">
+                    <div class="meta-row"><dt>Total area</dt><dd>{{ house.area }} m²</dd></div>
+                    <div class="meta-row"><dt>Floors</dt><dd>{{ house.floors }}</dd></div>
+                    <div class="meta-row"><dt>Price</dt><dd>{{ house.price|floatformat:"2g" }}</dd></div>
+                </dl>
+            </div>
+        </aside>
+
+        {% if user.is_staff %}
+        {% with projects=house.construction_projects.all %}
+        <aside class="card">
+            <div class="card-body">
+                <h3 class="card-title">Used in projects ({{ projects|length }})</h3>
+                {% if projects %}
+                    <dl class="meta-list">
+                        {% for project in projects %}
+                        <div class="meta-row">
+                            <dt><a href="{% url 'projects:project_detail' project.pk %}">{{ project.title }}</a></dt>
+                            <dd><span class="badge status-{{ project.status }}">{{ project.get_status_display }}</span></dd>
+                        </div>
+                        {% endfor %}
+                    </dl>
+                {% else %}
+                    <p class="help" style="margin:0;">No projects use this house type yet.</p>
+                {% endif %}
+            </div>
+        </aside>
+        {% endwith %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,8 @@
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -11,7 +13,6 @@ from django.views.generic import (
 
 from .forms import ConstructionProjectForm, HouseTypeForm
 from .models import ConstructionProject, HouseType
-
 
 
 class ManagerRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -98,10 +99,19 @@ class ProjectUpdateView(ManagerRequiredMixin, UpdateView):
     success_url = reverse_lazy("projects:project_list")
 
 
-class ProjectDeleteView(ManagerRequiredMixin, DeleteView):
-    model = ConstructionProject
-    template_name = "projects/project_confirm_delete.html"
-    success_url = reverse_lazy("projects:project_list")
+
+class ProjectArchiveView(ManagerRequiredMixin, View):
+
+    def post(self, request, *args, **kwargs):
+        project = get_object_or_404(
+            ConstructionProject,
+            pk=kwargs["pk"]
+        )
+
+        project.status = "archived"
+        project.save()
+
+        return redirect("projects:project_list")
 
 
 
