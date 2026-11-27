@@ -9,7 +9,7 @@ class Lead(models.Model):
         ('contract','contract'),
         ('rejected','rejected'),
     ]
-    house = models.ForeignKey('houses.House',on_delete=models.CASCADE,related_name='leads')
+    house = models.ForeignKey('projects.HouseType',on_delete=models.CASCADE,related_name='leads')
     client = models.ForeignKey('contracts.Client',on_delete=models.CASCADE,related_name='leads')
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=100)
@@ -26,4 +26,4 @@ class Lead(models.Model):
 
         
     def __str__(self):
-        return {self.name}
+        return self.name
