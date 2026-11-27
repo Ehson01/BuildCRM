@@ -9,14 +9,14 @@ class Client(models.Model):
         null=True,
         blank=True,
         related_name='client_profile',
-        verbose_name='Аккаунт пользователя'
+        verbose_name='User account'
     )
-    full_name = models.CharField(max_length=100)
-    phone = models.CharField(max_length=100)
-    email = models.EmailField(blank=True)
-    passport_data = models.CharField(max_length=255, blank=True, verbose_name='Паспорт')
-    address = models.TextField(blank=True, verbose_name='Адрес')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    full_name = models.CharField(max_length=100, verbose_name='Full name')
+    phone = models.CharField(max_length=100, verbose_name='Phone number')
+    email = models.EmailField(blank=True, verbose_name='Email address')
+    passport_data = models.CharField(max_length=255, blank=True, verbose_name='Passport details')
+    address = models.TextField(blank=True, verbose_name='Address')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created at')
 
     class Meta:
         verbose_name = 'Client'
@@ -29,21 +29,42 @@ class Client(models.Model):
 
 class Contract(models.Model):
     Status = [
-        ('active', 'active'),
-        ('paid', 'paid'),
-        ('completed', 'completed'),
-        ('cancelled', 'cancelled'),
+        ('active', 'Active'),
+        ('paid', 'Paid'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
     ]
 
-    lead = models.OneToOneField('leads.Lead', on_delete=models.SET_NULL, null=True, blank=True)
-    client = models.ForeignKey(Client, on_delete=models.PROTECT, related_name='contracts')
-    house = models.ForeignKey('houses.House', on_delete=models.PROTECT, related_name='contracts')
-    number = models.CharField(max_length=100, unique=True)
-    total_amount = models.DecimalField(max_digits=12, decimal_places=2)
-    start_date = models.DateField(auto_now_add=True)
-    end_date = models.DateField()
-    status = models.CharField(max_length=20, choices=Status, default='active')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    lead = models.OneToOneField(
+        'leads.Lead',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Lead'
+    )
+    client = models.ForeignKey(
+        Client,
+        on_delete=models.PROTECT,
+        related_name='contracts',
+        verbose_name='Client'
+    )
+    house = models.ForeignKey(
+        'houses.House',
+        on_delete=models.PROTECT,
+        related_name='contracts',
+        verbose_name='House project'
+    )
+    number = models.CharField(max_length=100, unique=True, verbose_name='Contract number')
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name='Total amount')
+    start_date = models.DateField(auto_now_add=True, verbose_name='Start date')
+    end_date = models.DateField(verbose_name='End date')
+    status = models.CharField(
+        max_length=20,
+        choices=Status,
+        default='active',
+        verbose_name='Status'
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created at')
 
     class Meta:
         verbose_name = 'Contract'
@@ -56,27 +77,32 @@ class Contract(models.Model):
 
 class Payment(models.Model):
     method = [
-        ('cash', 'cash'),
-        ('card', 'card'),
-        ('bank', 'bank'),
+        ('cash', 'Cash'),
+        ('card', 'Card'),
+        ('bank', 'Bank transfer'),
     ]
 
     contract = models.ForeignKey(
         Contract,
         on_delete=models.CASCADE,
         related_name='payments',
-        verbose_name='Договор'
+        verbose_name='Contract'
     )
-    amount = models.DecimalField(max_digits=12, decimal_places=2)
-    payment_method = models.CharField(max_length=20, choices=method, default='bank')
-    payment_date = models.DateField(default=timezone.localdate)
-    comment = models.CharField(max_length=255, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name='Payment amount')
+    payment_method = models.CharField(
+        max_length=20,
+        choices=method,
+        default='bank',
+        verbose_name='Payment method'
+    )
+    payment_date = models.DateField(default=timezone.localdate, verbose_name='Payment date')
+    comment = models.CharField(max_length=255, blank=True, verbose_name='Comment')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created at')
 
     class Meta:
-        verbose_name = 'Платёж'
-        verbose_name_plural = 'Платежи'
+        verbose_name = 'Payment'
+        verbose_name_plural = 'Payments'
         ordering = ['-payment_date', '-created_at']
 
     def __str__(self):
-        return f'Платёж {self.amount} по договору №{self.contract.number}'
+        return f'Payment {self.amount} for contract #{self.contract.number}'
