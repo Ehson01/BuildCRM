@@ -1,4 +1,3 @@
-
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -6,6 +5,8 @@ from django.urls import include, path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('leads/', include('leads.urls')),
+    path('contracts/', include('contracts.urls')),
     path("projects/", include("projects.urls")),
     path("stages/", include("stages.urls")),
 ]
@@ -15,3 +16,4 @@ if settings.DEBUG:
         settings.MEDIA_URL,
         document_root=settings.MEDIA_ROOT
     )
+

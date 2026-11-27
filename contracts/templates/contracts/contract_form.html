@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contract Form</title>
+</head>
+<body>
+    <h1>Create Contract</h1>
+    <p><a href="{% url 'contracts:contract_list' %}">Back to contracts</a></p>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save contract</button>
+    </form>
+</body>
+</html>

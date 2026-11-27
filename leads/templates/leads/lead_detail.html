@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lead #{{ lead.id }}</title>
+</head>
+<body>
+    <h1>Lead #{{ lead.id }}</h1>
+    <p><a href="{% url 'leads:list' %}">Back to leads</a></p>
+
+    <p><strong>Name:</strong> {{ lead.name }}</p>
+    <p><strong>Phone:</strong> {{ lead.phone }}</p>
+    <p><strong>Email:</strong> {{ lead.email }}</p>
+    <p><strong>House:</strong> {{ lead.house }}</p>
+    <p><strong>Client:</strong> {{ lead.client|default:"Not converted yet" }}</p>
+    <p><strong>Comment:</strong> {{ lead.comment|default:"-" }}</p>
+    <p><strong>Status:</strong> {{ lead.get_status_display }}</p>
+
+    <h2>Update Status</h2>
+    <form method="post">
+        {% csrf_token %}
+        <select name="status">
+            <option value="new" {% if lead.status == 'new' %}selected{% endif %}>New</option>
+            <option value="in_progress" {% if lead.status == 'in_progress' %}selected{% endif %}>In progress</option>
+            <option value="contract" {% if lead.status == 'contract' %}selected{% endif %}>Contract</option>
+            <option value="rejected" {% if lead.status == 'rejected' %}selected{% endif %}>Rejected</option>
+        </select>
+        <button type="submit">Save</button>
+    </form>
+
+    <p><a href="{% url 'leads:convert' lead.pk %}">Convert to client and create contract</a></p>
+</body>
+</html>
