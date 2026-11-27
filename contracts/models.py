@@ -42,7 +42,7 @@ class Contract(models.Model):
         blank=True,
         verbose_name='Lead'
     )
-    client = models.ForeignKey('contracts.Client', on_delete=models.CASCADE, related_name='leads')
+    client = models.ForeignKey('contracts.Client', on_delete=models.PROTECT, related_name='contracts')
     house = models.ForeignKey(
         'projects.HouseType',
         on_delete=models.PROTECT,

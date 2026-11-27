@@ -10,7 +10,7 @@ class Lead(models.Model):
         ('rejected','rejected'),
     ]
     house = models.ForeignKey('projects.HouseType',on_delete=models.PROTECT,related_name='leads')
-    client = models.ForeignKey('contracts.Client', on_delete=models.CASCADE, related_name='leads')
+    client = models.ForeignKey('contracts.Client',null=True,blank=True, on_delete=models.CASCADE, related_name='leads')
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=100)
     email = models.EmailField(blank=True,verbose_name='email')
