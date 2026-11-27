@@ -25,7 +25,6 @@ class ConstructionProjectForm(forms.ModelForm):
             "address",
             "house_type",
             "foreman",
-            "brigade",
             "start_date",
             "end_date",
             "status",
