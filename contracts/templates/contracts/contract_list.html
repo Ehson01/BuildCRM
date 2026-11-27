@@ -1,44 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Contracts</title>
-</head>
-<body>
-    <h1>Contracts</h1>
-    <p>
-        <a href="{% url 'contracts:contract_create' %}">+ New contract</a> |
-        <a href="{% url 'contracts:client_list' %}">Clients</a> |
-        <a href="{% url 'leads:list' %}">Leads</a>
-    </p>
+{% extends "base.html" %}
 
-    <table border="1" cellpadding="6" cellspacing="0">
-        <thead>
-            <tr>
-                <th>Number</th>
-                <th>Client</th>
-                <th>House</th>
-                <th>Total Amount</th>
-                <th>Status</th>
-                <th>Details</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for contract in contracts %}
-            <tr>
-                <td>{{ contract.number }}</td>
-                <td>{{ contract.client }}</td>
-                <td>{{ contract.house }}</td>
-                <td>{{ contract.total_amount }}</td>
-                <td>{{ contract.get_status_display }}</td>
-                <td><a href="{% url 'contracts:contract_detail' contract.pk %}">Open</a></td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6">No contracts yet.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</body>
-</html>
+{% block title %}Contracts · BuildCRM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Contracts</h2>
+        <p class="subtitle">Client agreements and payment tracking</p>
+    </div>
+    <div class="actions">
+        <a href="{% url 'contracts:client_list' %}" class="btn btn-outline">Clients</a>
+        <a href="{% url 'leads:list' %}" class="btn btn-outline">Leads</a>
+        <a href="{% url 'contracts:contract_create' %}" class="btn btn-primary">+ New Contract</a>
+    </div>
+</div>
+
+{% if contracts %}
+<div class="card">
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Number</th>
+                    <th>Client</th>
+                    <th>House Type</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contract in contracts %}
+                <tr>
+                    <td data-label="Number">
+                        <a class="cell-title" href="{% url 'contracts:contract_detail' contract.pk %}">#{{ contract.number }}</a>
+                        <span class="cell-sub">{{ contract.start_date|date:"M j, Y" }}</span>
+                    </td>
+                    <td data-label="Client">
+                        <a href="{% url 'contracts:client_detail' contract.client.pk %}">{{ contract.client.full_name }}</a>
+                    </td>
+                    <td data-label="House Type">
+                        {{ contract.house.title }}
+                    </td>
+                    <td data-label="Total Amount">
+                        <strong>${{ contract.total_amount }}</strong>
+                    </td>
+                    <td data-label="Status">
+                        <span class="badge badge-contract-{{ contract.status }}">{{ contract.get_status_display }}</span>
+                    </td>
+                    <td class="cell-actions">
+                        <a href="{% url 'contracts:contract_detail' contract.pk %}" class="btn btn-sm btn-outline">Open</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card empty">
+    <h3>No contracts yet</h3>
+    <p>Create a contract manually or convert an existing qualified lead.</p>
+    <a href="{% url 'contracts:contract_create' %}" class="btn btn-primary">+ New Contract</a>
+</div>
+{% endif %}
+{% endblock %}

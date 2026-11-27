@@ -1,24 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Brigades</title>
-</head>
-<body>
-    <h1>Brigades</h1>
+{% extends "base.html" %}
 
-    <a href="{% url 'brigade_create' %}">Create Brigade</a>
+{% block title %}Brigades · BuildCRM{% endblock %}
 
-    {% for brigade in brigades %}
-        <div>
-            <h3>{{ brigade.name }}</h3>
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Staff Brigades</h2>
+        <p class="subtitle">Construction teams and assigned foremen</p>
+    </div>
+    <div class="actions">
+        <a href="{% url 'brigade_create' %}" class="btn btn-primary">+ Create Brigade</a>
+    </div>
+</div>
 
-            <p>Foreman: {{ brigade.foreman }}</p>
-
-            <a href="{% url 'brigade_edit' brigade.pk %}">Edit</a>
-        </div>
-    {% empty %}
-        <p>No brigades found.</p>
-    {% endfor %}
-</body>
-</html>
+{% if brigades %}
+<div class="card">
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Brigade Name</th>
+                    <th>Foreman</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for brigade in brigades %}
+                <tr>
+                    <td data-label="Brigade Name">
+                        <span class="cell-title">{{ brigade.name }}</span>
+                    </td>
+                    <td data-label="Foreman">
+                        {{ brigade.foreman|default:"—" }}
+                    </td>
+                    <td class="cell-actions">
+                        <a href="{% url 'brigade_edit' brigade.pk %}" class="btn btn-sm btn-outline">Edit</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card empty">
+    <h3>No brigades found</h3>
+    <p>Get started by creating a construction brigade.</p>
+    <a href="{% url 'brigade_create' %}" class="btn btn-primary">+ Create Brigade</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,21 +1,61 @@
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Material Request</title>
-</head>
-<body>
-    <h1>Request Materials</h1>
+{% block title %}Request Materials · BuildCRM{% endblock %}
 
-    <h3>Project: {{ project.title }}</h3>
+{% block content %}
+<div class="breadcrumb">
+    <a href="{% url 'projects:project_list' %}">Projects</a>
+    <span class="sep">/</span>
+    <a href="{% url 'projects:project_detail' project.pk %}">{{ project.title }}</a>
+    <span class="sep">/</span>
+    <span>Request Materials</span>
+</div>
 
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Send Request</button>
-    </form>
+<div class="page-header">
+    <div>
+        <h2>Request Materials</h2>
+        <p class="subtitle">Request supplies for project: <strong>{{ project.title }}</strong></p>
+    </div>
+</div>
 
-    <a href="{% url 'request_list' %}">Back</a>
-</body>
-</html>
+<div class="card form-card">
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="form-grid">
+                {% for field in form %}
+                <div class="form-field full{% if field.errors %} has-error{% endif %}">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="req">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <span class="help">{{ field.help_text }}</span>
+                    {% endif %}
+                    {% if field.errors %}
+                        <ul class="errorlist">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Send Request</button>
+                <a href="{% url 'projects:project_detail' project.pk %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

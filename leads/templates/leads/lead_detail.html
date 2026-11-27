@@ -1,33 +1,86 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Lead #{{ lead.id }}</title>
-</head>
-<body>
-    <h1>Lead #{{ lead.id }}</h1>
-    <p><a href="{% url 'leads:list' %}">Back to leads</a></p>
+{% extends "base.html" %}
 
-    <p><strong>Name:</strong> {{ lead.name }}</p>
-    <p><strong>Phone:</strong> {{ lead.phone }}</p>
-    <p><strong>Email:</strong> {{ lead.email }}</p>
-    <p><strong>House:</strong> {{ lead.house }}</p>
-    <p><strong>Client:</strong> {{ lead.client|default:"Not converted yet" }}</p>
-    <p><strong>Comment:</strong> {{ lead.comment|default:"-" }}</p>
-    <p><strong>Status:</strong> {{ lead.get_status_display }}</p>
+{% block title %}Lead #{{ lead.id }} · {{ lead.name }} · BuildCRM{% endblock %}
 
-    <h2>Update Status</h2>
-    <form method="post">
-        {% csrf_token %}
-        <select name="status">
-            <option value="new" {% if lead.status == 'new' %}selected{% endif %}>New</option>
-            <option value="in_progress" {% if lead.status == 'in_progress' %}selected{% endif %}>In progress</option>
-            <option value="contract" {% if lead.status == 'contract' %}selected{% endif %}>Contract</option>
-            <option value="rejected" {% if lead.status == 'rejected' %}selected{% endif %}>Rejected</option>
-        </select>
-        <button type="submit">Save</button>
-    </form>
+{% block content %}
+<div class="breadcrumb">
+    <a href="{% url 'leads:list' %}">Leads</a>
+    <span class="sep">/</span>
+    <span>Lead #{{ lead.id }}</span>
+</div>
 
-    <p><a href="{% url 'leads:convert' lead.pk %}">Convert to client and create contract</a></p>
-</body>
-</html>
+<div class="page-header">
+    <div>
+        <h2>{{ lead.name }}</h2>
+        <p class="subtitle">Lead #{{ lead.id }} &middot; Interested in {{ lead.house.title }}</p>
+    </div>
+    <div class="actions">
+        {% if lead.status != 'contract' %}
+            <a href="{% url 'leads:convert' lead.pk %}" class="btn btn-primary">Convert to Contract</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="detail-grid">
+    <div class="card">
+        <div class="card-header">
+            <h3>Lead Information</h3>
+        </div>
+        <div class="card-body">
+            <dl class="meta-list">
+                <div class="meta-row">
+                    <dt>Full Name</dt>
+                    <dd>{{ lead.name }}</dd>
+                </div>
+                <div class="meta-row">
+                    <dt>Phone</dt>
+                    <dd>{{ lead.phone }}</dd>
+                </div>
+                <div class="meta-row">
+                    <dt>Email</dt>
+                    <dd>{{ lead.email|default:"—" }}</dd>
+                </div>
+                <div class="meta-row">
+                    <dt>House Model</dt>
+                    <dd><a href="{% url 'projects:house_detail' lead.house.pk %}">{{ lead.house.title }}</a></dd>
+                </div>
+                <div class="meta-row">
+                    <dt>Converted Client</dt>
+                    <dd>
+                        {% if lead.client %}
+                            <a href="{% url 'contracts:client_detail' lead.client.pk %}">{{ lead.client.full_name }}</a>
+                        {% else %}
+                            <span class="text-muted">Not converted yet</span>
+                        {% endif %}
+                    </dd>
+                </div>
+                <div class="meta-row">
+                    <dt>Comment / Notes</dt>
+                    <dd>{{ lead.comment|default:"—" }}</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3>Update Lead Status</h3>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-field full">
+                    <label for="status_select">Current Status</label>
+                    <select id="status_select" name="status" style="margin-bottom: 16px;">
+                        <option value="new" {% if lead.status == 'new' %}selected{% endif %}>New</option>
+                        <option value="in_progress" {% if lead.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                        <option value="contract" {% if lead.status == 'contract' %}selected{% endif %}>Contract</option>
+                        <option value="rejected" {% if lead.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Status</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,26 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-</head>
-<body>
-    <h1>Login</h1>
+{% extends "base.html" %}
 
-    <form method="POST">
-        {% csrf_token %}
+{% block title %}Login · BuildCRM{% endblock %}
 
-        {{ form.as_p }}
+{% block content %}
+<div class="card auth-card">
+    <div class="card-header" style="text-align: center; justify-content: center; padding: 22px;">
+        <h2 style="font-size: 22px;">Welcome to BuildCRM</h2>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
 
-        <button type="submit">Login</button>
-    </form>
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
 
-    <p>Don't have an account?
-        <a href="{% url 'register' %}">Register</a>
-    </p>
+            <div class="form-field full" style="margin-bottom: 16px;">
+                <label for="{{ form.username.id_for_label }}">Username</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div class="text-danger small">{{ form.username.errors }}</div>
+                {% endif %}
+            </div>
 
-    <p>
-        <a href="{% url 'password_reset' %}">Forgot password?</a>
-    </p>
-</body>
-</html>
+            <div class="form-field full" style="margin-bottom: 20px;">
+                <label for="{{ form.password.id_for_label }}">Password</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <div class="text-danger small">{{ form.password.errors }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 10px;">Sign In</button>
+        </form>
+
+        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; font-size: 14px;">
+            <p style="margin: 0 0 8px;">Don't have an account? <a href="{% url 'register' %}">Create account</a></p>
+            <p style="margin: 0;"><a href="{% url 'password_reset' %}" class="text-muted">Forgot your password?</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

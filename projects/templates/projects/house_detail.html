@@ -15,6 +15,7 @@
 
     <div class="actions">
         <a href="{% url 'projects:house_list' %}" class="btn btn-outline">Back</a>
+        <a href="{% url 'leads:create' house.pk %}" class="btn btn-primary">+ Create Lead</a>
         {% if user.is_staff %}
             <a href="{% url 'projects:house_edit' house.pk %}" class="btn btn-outline">Edit</a>
             <a href="{% url 'projects:house_delete' house.pk %}" class="btn btn-danger-outline">Delete</a>

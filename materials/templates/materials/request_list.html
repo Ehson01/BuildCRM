@@ -1,36 +1,80 @@
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Material Requests</title>
-</head>
-<body>
-    <h1>Material Requests</h1>
+{% block title %}Material Requests · BuildCRM{% endblock %}
 
-    {% for i in requests %}
-        <hr>
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Material Requests</h2>
+        <p class="subtitle">Requests submitted by foremen from construction sites</p>
+    </div>
+    <div class="actions">
+        <a href="{% url 'material_list' %}" class="btn btn-outline">Warehouse Inventory</a>
+    </div>
+</div>
 
-        <h3>{{ i.material.name }}</h3>
-        <p>Project: {{ i.project.title }}</p>
-        <p>Quantity: {{ i.quantity }}</p>
-        <p>Requested by: {{ i.requested_by.username }}</p>
-        <p>Status: {{ i.get_status_display }}</p>
-
-        {% if user.role == 'manager' and i.status == 'pending' %}
-            <form method="POST" action="{% url 'request_approve' i.pk %}">
-                {% csrf_token %}
-                <button type="submit">Approve</button>
-            </form>
-
-            <form method="POST" action="{% url 'request_reject' i.pk %}">
-                {% csrf_token %}
-                <button type="submit">Reject</button>
-            </form>
-        {% endif %}
-    {% empty %}
-        <p>No requests yet.</p>
-    {% endfor %}
-</body>
-</html>
-
+{% if requests %}
+<div class="card">
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Material</th>
+                    <th>Project</th>
+                    <th>Quantity</th>
+                    <th>Requested By</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in requests %}
+                <tr>
+                    <td data-label="Material">
+                        <span class="cell-title">{{ i.material.name }}</span>
+                    </td>
+                    <td data-label="Project">
+                        <a href="{% url 'projects:project_detail' i.project.pk %}">{{ i.project.title }}</a>
+                    </td>
+                    <td data-label="Quantity">
+                        <strong>{{ i.quantity }}</strong> {{ i.material.unit }}
+                    </td>
+                    <td data-label="Requested By">
+                        {{ i.requested_by.username|default:"—" }}
+                    </td>
+                    <td data-label="Status">
+                        <span class="badge badge-req-{{ i.status }}">{{ i.get_status_display }}</span>
+                    </td>
+                    <td class="cell-actions">
+                        {% if user.role == 'manager' or user.is_staff %}
+                            {% if i.status == 'pending' %}
+                                <div style="display: inline-flex; gap: 6px;">
+                                    <form method="POST" action="{% url 'request_approve' i.pk %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                    </form>
+                                    <form method="POST" action="{% url 'request_reject' i.pk %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-danger-outline">Reject</button>
+                                    </form>
+                                </div>
+                            {% else %}
+                                <span class="cell-sub">Processed</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="cell-sub">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card empty">
+    <h3>No material requests yet</h3>
+    <p>Material requests created from project details will appear here.</p>
+</div>
+{% endif %}
+{% endblock %}

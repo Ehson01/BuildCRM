@@ -1,22 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Register</title>
-</head>
-<body>
-    <h1>Create Account</h1>
+{% extends "base.html" %}
 
-    <form method="POST">
-        {% csrf_token %}
+{% block title %}Register · BuildCRM{% endblock %}
 
-        {{ form.as_p }}
+{% block content %}
+<div class="card auth-card" style="max-width: 520px;">
+    <div class="card-header" style="text-align: center; justify-content: center; padding: 22px;">
+        <h2 style="font-size: 22px;">Create an Account</h2>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
 
-        <button type="submit">Register</button>
-    </form>
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
 
-    <p>Already have an account?
-        <a href="{% url 'login' %}">Login</a>
-    </p>
-</body>
-</html>
+            <div class="form-grid">
+                {% for field in form %}
+                <div class="form-field full{% if field.errors %} has-error{% endif %}">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="req">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <span class="help">{{ field.help_text }}</span>
+                    {% endif %}
+                    {% if field.errors %}
+                        <ul class="errorlist">
+                            {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-actions" style="border-top: 0; padding-top: 8px;">
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 10px;">Register</button>
+            </div>
+        </form>
+
+        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; font-size: 14px;">
+            <p style="margin: 0;">Already have an account? <a href="{% url 'login' %}">Sign In</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,17 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Contract Form</title>
-</head>
-<body>
-    <h1>Create Contract</h1>
-    <p><a href="{% url 'contracts:contract_list' %}">Back to contracts</a></p>
+{% extends "base.html" %}
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save contract</button>
-    </form>
-</body>
-</html>
+{% block title %}Create Contract · BuildCRM{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <a href="{% url 'contracts:contract_list' %}">Contracts</a>
+    <span class="sep">/</span>
+    <span>Create Contract</span>
+</div>
+
+<div class="page-header">
+    <div>
+        <h2>Create Contract</h2>
+        <p class="subtitle">Set up client agreement and pricing</p>
+    </div>
+</div>
+
+<div class="card form-card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="form-grid">
+                {% for field in form %}
+                <div class="form-field full{% if field.errors %} has-error{% endif %}">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="req">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}<span class="help">{{ field.help_text }}</span>{% endif %}
+                    {% if field.errors %}
+                        <ul class="errorlist">
+                            {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Contract</button>
+                <a href="{% url 'contracts:contract_list' %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
