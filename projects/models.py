@@ -49,13 +49,7 @@ class ConstructionProject(models.Model):
         blank=True
     )
 
-    brigade = models.ForeignKey(
-        "staff.Brigade",
-        on_delete=models.SET_NULL,
-        related_name="projects",
-        null=True,
-        blank=True
-    )
+    
 
     start_date = models.DateField()
     end_date = models.DateField()
