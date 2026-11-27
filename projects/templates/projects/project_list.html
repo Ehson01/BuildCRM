@@ -20,6 +20,17 @@
     </div>
 </div>
 
+<div class="filter-bar">
+    <div class="search-form" style="width: 100%;">
+        <input
+            type="search"
+            name="search"
+            placeholder="Search projects by name, address, foreman or brigade... (Press '/' to focus)"
+            style="width: 100%; max-width: 480px;"
+        >
+    </div>
+</div>
+
 {% if projects %}
 <div class="card">
     <div class="table-wrap">
@@ -65,12 +76,10 @@
 </div>
 {% else %}
 <div class="card empty">
-    <h3>No projects yet</h3>
+    <h3>No projects found</h3>
+    <p>There are no construction projects to display.</p>
     {% if user.is_staff %}
-        <p>Create the first construction project to get started.</p>
-        <a href="{% url 'projects:project_create' %}" class="btn btn-primary">+ New project</a>
-    {% else %}
-        <p>No projects are assigned to you at the moment.</p>
+        <a href="{% url 'projects:project_create' %}" class="btn btn-primary">+ Create First Project</a>
     {% endif %}
 </div>
 {% endif %}
