@@ -1,30 +1,88 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ client.full_name }}</title>
-</head>
-<body>
-    <h1>{{ client.full_name }}</h1>
-    <p><a href="{% url 'contracts:client_list' %}">Back to clients</a></p>
+{% extends "base.html" %}
 
-    <p><strong>Phone:</strong> {{ client.phone }}</p>
-    <p><strong>Email:</strong> {{ client.email }}</p>
-    <p><strong>Passport:</strong> {{ client.passport_data }}</p>
-    <p><strong>Address:</strong> {{ client.address }}</p>
+{% block title %}{{ client.full_name }} · BuildCRM{% endblock %}
 
-    <h2>Contracts</h2>
-    <ul>
-        {% for contract in client.contracts.all %}
-        <li>
-            <a href="{% url 'contracts:contract_detail' contract.pk %}">
-                Contract #{{ contract.number }}
-            </a>
-            — {{ contract.total_amount }} ({{ contract.get_status_display }})
-        </li>
-        {% empty %}
-        <li>No contracts for this client.</li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+{% block content %}
+<div class="breadcrumb">
+    <a href="{% url 'contracts:client_list' %}">Clients</a>
+    <span class="sep">/</span>
+    <span>{{ client.full_name }}</span>
+</div>
+
+<div class="page-header">
+    <div>
+        <h2>{{ client.full_name }}</h2>
+        <p class="subtitle">Client profile and history</p>
+    </div>
+    <div class="actions">
+        <a href="{% url 'contracts:contract_create' %}" class="btn btn-primary">+ Create Contract</a>
+    </div>
+</div>
+
+<div class="detail-grid">
+    <div class="card">
+        <div class="card-header">
+            <h3>Client Contracts</h3>
+        </div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Contract</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contract in client.contracts.all %}
+                    <tr>
+                        <td data-label="Contract">
+                            <a class="cell-title" href="{% url 'contracts:contract_detail' contract.pk %}">#{{ contract.number }}</a>
+                            <span class="cell-sub">{{ contract.house.title }}</span>
+                        </td>
+                        <td data-label="Amount"><strong>${{ contract.total_amount }}</strong></td>
+                        <td data-label="Status">
+                            <span class="badge badge-contract-{{ contract.status }}">{{ contract.get_status_display }}</span>
+                        </td>
+                        <td class="cell-actions">
+                            <a href="{% url 'contracts:contract_detail' contract.pk %}" class="btn btn-sm btn-outline">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">No contracts for this client yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3>Contact Information</h3>
+        </div>
+        <div class="card-body">
+            <dl class="meta-list">
+                <div class="meta-row">
+                    <dt>Phone</dt>
+                    <dd>{{ client.phone }}</dd>
+                </div>
+                <div class="meta-row">
+                    <dt>Email</dt>
+                    <dd>{{ client.email|default:"—" }}</dd>
+                </div>
+                <div class="meta-row">
+                    <dt>Passport</dt>
+                    <dd>{{ client.passport_data|default:"—" }}</dd>
+                </div>
+                <div class="meta-row">
+                    <dt>Address</dt>
+                    <dd>{{ client.address|default:"—" }}</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -19,6 +19,7 @@
 
     <div class="actions">
         <a href="{% url 'projects:project_list' %}" class="btn btn-outline">Back</a>
+        <a href="{% url 'request_create' project.pk %}" class="btn btn-outline">Request Materials</a>
         {% if user.is_staff %}
             <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-outline">Edit</a>
             {% if project.status != "archived" %}

@@ -1,48 +1,76 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Leads</title>
-</head>
-<body>
-    <h1>Leads</h1>
-    <p>
-        <a href="{% url 'contracts:client_list' %}">Clients</a> |
-        <a href="{% url 'contracts:contract_list' %}">Contracts</a>
-    </p>
+{% extends "base.html" %}
 
-    <table border="1" cellpadding="6" cellspacing="0">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>House</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for lead in leads %}
-            <tr>
-                <td>{{ lead.id }}</td>
-                <td>{{ lead.name }}</td>
-                <td>{{ lead.phone }}</td>
-                <td>{{ lead.email }}</td>
-                <td>{{ lead.house }}</td>
-                <td>{{ lead.get_status_display }}</td>
-                <td>
-                    <a href="{% url 'leads:detail' lead.pk %}">Details</a> |
-                    <a href="{% url 'leads:convert' lead.pk %}">Convert</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="7">No leads yet.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</body>
-</html>
+{% block title %}Leads · BuildCRM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Sales Leads</h2>
+        <p class="subtitle">Prospective clients and incoming requests</p>
+    </div>
+    <div class="actions">
+        <a href="{% url 'contracts:client_list' %}" class="btn btn-outline">Clients</a>
+        <a href="{% url 'contracts:contract_list' %}" class="btn btn-outline">Contracts</a>
+    </div>
+</div>
+
+<div class="filter-bar">
+    <div class="search-form" style="width: 100%;">
+        <input
+            type="search"
+            name="search"
+            placeholder="Search leads by name, phone, house type... (Press '/' to focus)"
+            style="width: 100%; max-width: 480px;"
+        >
+    </div>
+</div>
+
+{% if leads %}
+<div class="card">
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Lead Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Interested In</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lead in leads %}
+                <tr>
+                    <td data-label="Lead Name">
+                        <a class="cell-title" href="{% url 'leads:detail' lead.pk %}">{{ lead.name }}</a>
+                        <span class="cell-sub">ID: #{{ lead.id }}</span>
+                    </td>
+                    <td data-label="Phone">{{ lead.phone }}</td>
+                    <td data-label="Email">{{ lead.email|default:"—" }}</td>
+                    <td data-label="Interested In">
+                        {{ lead.house.title }}
+                    </td>
+                    <td data-label="Status">
+                        <span class="badge badge-lead-{{ lead.status }}">{{ lead.get_status_display }}</span>
+                    </td>
+                    <td class="cell-actions">
+                        <a href="{% url 'leads:detail' lead.pk %}" class="btn btn-sm btn-outline">Details</a>
+                        {% if lead.status != 'contract' %}
+                            <a href="{% url 'leads:convert' lead.pk %}" class="btn btn-sm btn-primary">Convert</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card empty">
+    <h3>No leads yet</h3>
+    <p>Incoming customer requests for houses will be listed here.</p>
+    <a href="{% url 'projects:house_list' %}" class="btn btn-outline">View House Types</a>
+</div>
+{% endif %}
+{% endblock %}

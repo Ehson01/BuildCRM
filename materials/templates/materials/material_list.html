@@ -1,59 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Materials</title>
-</head>
-<body>
-    <h1>Materials</h1>
+{% extends "base.html" %}
 
-    <a href="{% url 'material_create' %}">Add Material</a>
+{% block title %}Materials · BuildCRM{% endblock %}
 
-    <form method="GET">
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Materials Warehouse</h2>
+        <p class="subtitle">Inventory management and stock tracking</p>
+    </div>
+    <div class="actions">
+        <a href="{% url 'request_list' %}" class="btn btn-outline">Material Requests</a>
+        <a href="{% url 'material_create' %}" class="btn btn-primary">+ Add Material</a>
+    </div>
+</div>
+
+<div class="filter-bar">
+    <form method="GET" class="search-form">
         <input
             type="text"
             name="search"
             placeholder="Search material..."
             value="{{ search|default:'' }}"
+            style="min-width: 240px;"
         >
-
-        <button type="submit">Search</button>
-
-        <label>
+        <label style="display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer;">
             <input
                 type="checkbox"
                 name="low_stock"
                 value="1"
                 {% if low_stock %}checked{% endif %}
             >
-            Low stock only
+            <span>Low stock only</span>
         </label>
-
-        <button type="submit">Filter</button>
-
-        <a href="{% url 'material_list' %}">Reset</a>
+        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+        {% if search or low_stock %}
+            <a href="{% url 'material_list' %}" class="btn btn-sm btn-outline">Reset</a>
+        {% endif %}
     </form>
+</div>
 
-    {% for material in materials %}
-        <div>
-            <h3>{{ material.name }}</h3>
-
-            <p>{{ material.description }}</p>
-
-            <p>Quantity: {{ material.quantity }} {{ material.unit }}</p>
-
-            <p>Minimum quantity: {{ material.min_quantity }} {{ material.unit }}</p>
-
-            <p>Price: {{ material.price }}</p>
-
-            {% if material.quantity < material.min_quantity %}
-                <p>⚠️ Low stock!</p>
-            {% endif %}
-
-            <a href="{% url 'material_edit' material.pk %}">Edit</a>
-        </div>
-    {% empty %}
-        <p>No materials found.</p>
-    {% endfor %}
-</body>
-</html>
+{% if materials %}
+<div class="card">
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Material</th>
+                    <th>In Stock</th>
+                    <th>Min. Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for material in materials %}
+                <tr>
+                    <td data-label="Material">
+                        <span class="cell-title">{{ material.name }}</span>
+                        {% if material.description %}
+                            <span class="cell-sub">{{ material.description|truncatechars:70 }}</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="In Stock">
+                        <strong>{{ material.quantity }}</strong> {{ material.unit }}
+                    </td>
+                    <td data-label="Min. Quantity">
+                        {{ material.min_quantity }} {{ material.unit }}
+                    </td>
+                    <td data-label="Unit Price">
+                        ${{ material.price }}
+                    </td>
+                    <td data-label="Status">
+                        {% if material.quantity < material.min_quantity %}
+                            <span class="badge" style="background: var(--danger-soft); color: var(--danger);">⚠️ Low Stock</span>
+                        {% else %}
+                            <span class="badge" style="background: var(--success-soft); color: var(--success);">In Stock</span>
+                        {% endif %}
+                    </td>
+                    <td class="cell-actions">
+                        <a href="{% url 'material_edit' material.pk %}" class="btn btn-sm btn-outline">Edit</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card empty">
+    <h3>No materials found</h3>
+    <p>Try clearing your filters or create a new material entry.</p>
+    <a href="{% url 'material_create' %}" class="btn btn-primary">+ Add Material</a>
+</div>
+{% endif %}
+{% endblock %}
