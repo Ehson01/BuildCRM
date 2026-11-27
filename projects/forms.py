@@ -7,7 +7,7 @@ from .models import ConstructionProject, HouseType
 class HouseTypeForm(forms.ModelForm):
     class Meta:
         model = HouseType
-        fields = [  # noqa: RUF012
+        fields = [
             "title",
             "description",
             "area",
@@ -20,7 +20,7 @@ class HouseTypeForm(forms.ModelForm):
 class ConstructionProjectForm(forms.ModelForm):
     class Meta:
         model = ConstructionProject
-        fields = [  # noqa: RUF012
+        fields = [
             "title",
             "address",
             "house_type",
@@ -30,7 +30,7 @@ class ConstructionProjectForm(forms.ModelForm):
             "status",
         ]
 
-        widgets = {  # noqa: RUF012
+        widgets = {
             "start_date": forms.DateInput(attrs={"type": "date"}),
             "end_date": forms.DateInput(attrs={"type": "date"}),
         }
