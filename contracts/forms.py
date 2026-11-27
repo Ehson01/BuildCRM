@@ -6,7 +6,7 @@ from decimal import Decimal
 class ClientForm(forms.ModelForm):
     class Meta:
         model = Client
-        fields = ['user', 'full_name', 'phone', 'email', 'passport_data', 'address']
+        fields = ['full_name', 'phone', 'email', 'passport_data', 'address']
 
 
 class ContractForm(forms.ModelForm):
